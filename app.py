@@ -14,20 +14,20 @@ CORS(app)
 def index():
     if request.method == 'POST':
         colorRanges = {
-            'Light blue': ([95,40,40],[102,255,255]),
-            'Orange': ([14,40,40], [24,255,255]),
-            'Dark Orange': ([6,40,40], [10,100,100]),
-            'Dark Red': ([[0, 40, 40]], [0, 255, 255]),
-            'Red': ([170, 40, 40], [180, 255, 255]),
-            'Gold': ([[21,40,40]], [26,255,255]),
-            'Yellow': ([27,40,40],[35,255,255]),
-            'Light Green': ([32,40,40], [40,255,255]),
-            'Green' : ([40,40,40], [50,255,255]),
-            'Teal': ([84,40,40], [88,255,255]),
-            'Dark Green': ([64,40,40],[72,255,255]),
-            'Dark Blue': ([107,40,40], [115,255,255]),
-            'White': ([0,0,0],[0,10,255]),
-            'Black': ([0,0,0],[200,255,42])
+            'Orange': ([6,150,150], [22,255,255]),
+            'Red': ([170, 40, 40], [180,255,255]),
+            'Gold': ([[22,40,40]], [24,255,255]),
+            'Yellow': ([24,40,40],[35,255,255]),
+            'Green' : ([32,40,40], [85,255,255]),
+            'Teal': ([94,40,40], [98, 255,255]),
+            'Blue': ([98,40,40],[115,255,255]),
+            'Purple': ([127, 40, 40], [138, 255, 255]),
+            'Pink': ([160, 40, 40], [170, 255, 255]),
+            'Brown': ([6, 100, 100], [20, 170, 170]),
+            'Gray': ([110, 0, 0], [120, 180, 180]),
+            'White': ([0, 0, 200], [255, 255, 255]),
+            'Black': ([0, 0, 0], [255, 120, 120]),
+            'Cyan': ([84, 40, 40], [92, 255, 255])
         }
 
         base_64 = request.json["base_64"]
@@ -42,25 +42,24 @@ def index():
         #dictionary to count number of undetected pixels in image for each color
         pixelDict = {}
 
-        #Detection for each colour in image
         for color in colorRanges:
             lowerLimit = np.array(colorRanges[color][0])
             upperLimit = np.array(colorRanges[color][1])
-            imageSize = np.shape(RGBimage)
+            imageSize = np.shape(HSVimage)
             background = np.zeros((imageSize[1], imageSize[2]))
-            mask = cv2.inRange(RGBimage, lowerLimit, upperLimit)
-            detection = cv2.bitwise_and(RGBimage, RGBimage, mask=mask)
+            mask = cv2.inRange(HSVimage, lowerLimit, upperLimit)
+            detection = cv2.bitwise_and(HSVimage, HSVimage, mask=mask)
             pixelCount = 0
             for pixel in detection:
-                if pixel.any() == background.any():
+                if pixel.any() != background.any():
                     pixelCount += 1
                     pixelDict[color] = pixelCount
 
         #List of most dominant colors in the image
         color = []
-        minKey = min(pixelDict, key = pixelDict.get)
+        maxKey = max(pixelDict, key = pixelDict.get)
         for key in pixelDict:
-            if pixelDict[key] == pixelDict[minKey]:
+            if pixelDict[key] == pixelDict[maxKey]:
                 color.append(key)
         return jsonify({'answer': color, 'data': pixelDict})
     elif request.method == 'GET':
