@@ -37,7 +37,7 @@ def index():
         #Converts image from BGR to RGB
         BGRimage = cv2.imread("image.png")
         os.remove("image.png")
-        RGBimage = cv2.cvtColor(BGRimage, cv2.COLOR_BGR2HSV)
+        HSVimage = cv2.cvtColor(BGRimage, cv2.COLOR_BGR2HSV)
 
         #dictionary to count number of undetected pixels in image for each color
         pixelDict = {}
